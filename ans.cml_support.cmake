@@ -1,4 +1,5 @@
-function(cml_support TARGET)
+# environment variable CML_DIR must be set first
+function(cml_support)
     find_package(CML REQUIRED)
     #include_directories(${CML_INCLUDE_DIRS})
     include(${CML_USE_FILE})
@@ -14,5 +15,4 @@ function(cml_support TARGET)
         -DCML_AUTOMATIC_MATRIX_RESIZE_ON_ASSIGNMENT
         -DCML_CHECK_MATRIX_EXPR_SIZES
         )
-    message("cml support for ${TARGET} done")
 endfunction()

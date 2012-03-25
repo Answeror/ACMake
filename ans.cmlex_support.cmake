@@ -1,0 +1,5 @@
+macro(cmlex_support)
+    cml_support()
+    find_package(CMLEX REQUIRED)
+    include_directories(${CMLEX_INCLUDE_DIRS})
+endmacro()
