@@ -1,3 +1,5 @@
+include(ans.parse_arguments)
+
 macro(filter_files_contain pattern out_var in_var)
     set(${out_var}_temp)
     foreach(file_name ${${in_var}})
@@ -10,7 +12,16 @@ macro(filter_files_contain pattern out_var in_var)
     set(${out_var} ${${out_var}_temp})
 endmacro()
 
-MACRO(qt_support qt_files qt_libraries)
+MACRO(qt_support)
+    PARSE_ARGUMENTS(
+        QT_SUPPORT
+        "HEADER;UI;RESOURSE"
+        ""
+        ${ARGN}
+        )
+    CAR(qt_files ${QT_SUPPORT_DEFAULT_ARGS})
+    CDR(QT_SUPPORT_REST ${QT_SUPPORT_DEFAULT_ARGS})
+    CAR(qt_libraries ${QT_SUPPORT_REST})
 
     SET(project_name ${PROJECT_NAME})
 
@@ -24,6 +35,9 @@ MACRO(qt_support qt_files qt_libraries)
     FILE(GLOB_RECURSE ${project_name}_header *.h *.hpp)
     FILE(GLOB_RECURSE ${project_name}_ui *.ui)
     FILE(GLOB_RECURSE ${project_name}_resource *.qrc)
+    list(APPEND ${project_name}_header ${QT_SUPPORT_HEADER})
+    list(APPEND ${project_name}_ui ${QT_SUPPORT_UI})
+    list(APPEND ${project_name}_resource ${QT_SUPPORT_RESOURCE})
 
     filter_files_contain(".*Q_OBJECT.*" ${project_name}_header ${project_name}_header)
 

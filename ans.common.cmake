@@ -1,6 +1,7 @@
 include(ans.boost_support)
 include(ans.ans_support)
 include(ans.cml_support)
+include(ans.cmlex_support)
 include(ans.qt_support)
 include(ans.opencv_support)
 include(ans.qwt_support)
