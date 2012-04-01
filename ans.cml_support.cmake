@@ -1,6 +1,10 @@
+include(ans.env)
+include(ans.expand_find_package_hints)
+
 # environment variable CML_DIR must be set first
 function(cml_support)
-    find_package(CML REQUIRED)
+    expand_find_package_hints(CML)
+    find_package(CML REQUIRED HINTS ${CML_FIND_PACKAGE_HINTS})
     #include_directories(${CML_INCLUDE_DIRS})
     include(${CML_USE_FILE})
     add_definitions(

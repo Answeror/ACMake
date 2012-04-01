@@ -1,0 +1,5 @@
+if(NOT ANS_ENV_INCLUDED)
+    set(ANS_TEMPLATE_DIR "${ACMake_INSTALL_DIR}/template")
+    set(ANS_ENV_INCLUDED TRUE)
+    set(ACMAKE_FIND_PACKAGE_HINTS ${CMAKE_SOURCE_DIR}/misc/3rd)
+endif()
