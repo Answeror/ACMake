@@ -1,3 +1,4 @@
+# warning: use acmake_subdirectories instead
 macro(list_subdirectories retval curdir return_relative)
 
     file(GLOB sub-dir RELATIVE ${curdir} *)

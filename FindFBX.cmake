@@ -1,69 +1,45 @@
-# Borrowed from OSG
+# requires: cache/environment variable FBX_HOME or FBX_ROOT
+# output:
+#   FBX_FOUND
+#   FBX_INCLUDE_DIRS
+#   FBX_LIBRARIES
+# warning: only support MSVC currently
 
-# Locate FBX
-# This module defines:
-# FBX_INCLUDE_DIR, where to find the headers
-#
-# FBX_LIBRARY, FBX_LIBRARY_DEBUG
-# FBX_FOUND
-#
-# $FBX_DIR is an environment variable that would
-# correspond to the ./configure --prefix=$FBX_DIR
+include(FindPkgMacros)
+include(acmake_collect_home)
 
-IF(APPLE)
-    SET(FBX_LIBNAME "fbxsdk_gcc4_ub")
-ELSEIF(CMAKE_COMPILER_IS_GNUCXX)
-    SET(FBX_LIBNAME "fbxsdk_gcc4")
-    #TODO: libs are provided for GCC 3.4 & 4.0 in both 32 and 64 bit versions
-    # but I don't know how to confgure that here.
-ELSEIF(MSVC71)
-    SET(FBX_LIBNAME "fbxsdk_md2003")
-ELSEIF(MSVC80)
-    SET(FBX_LIBNAME "fbxsdk_md2005")
-ELSEIF(MSVC90)
-    SET(FBX_LIBNAME "fbxsdk_md2008")
-ELSEIF(MSVC100 OR MSVC_VER>1600)
-    SET(FBX_LIBNAME "fbxsdk_md2010")
-ENDIF()
+findpkg_begin(FBX)
 
-IF(CMAKE_CL_64)
-    SET(FBX_LIBNAME ${FBX_LIBNAME}_amd64)
-ENDIF()
+# only support MSVC currently
+if(MSVC)
+    acmake_collect_home(FBX)
+    if(FBX_HOME)
+        set(FBX_PREFIX_PATH "${FBX_HOME}")
+        create_search_paths(FBX)
+        if(MSVC80)
+            set(FBX_LIBRARY_NAMES fbxsdk_md2005)
+        elseif(MSVC90)
+            set(FBX_LIBRARY_NAMES fbxsdk_md2008)
+        elseif(MSVC10)
+            set(FBX_LIBRARY_NAMES fbxsdk_md2010)
+        endif()
+        # only continue when lib name setted
+        if(FBX_LIBRARY_NAMES)
+            set(FBX_INCLUDE_DIR "${FBX_HOME}/include")
+            get_debug_names(FBX_LIBRARY_NAMES)
+            find_library(
+                FBX_LIBRARY_REL
+                NAMES "${FBX_LIBRARY_NAMES}"
+                HINTS "${FBX_LIB_SEARCH_PATH}"
+                )
+            find_library(
+                FBX_LIBRARY_DBG
+                NAMES "${FBX_LIBRARY_NAMES_DBG}"
+                HINTS "${FBX_LIB_SEARCH_PATH}"
+                )
+            make_library_set(BFX_LIBRARY)
+        endif()
+    endif()
+endif()
 
-IF(APPLE)
-    SET(FBX_LIBNAME_DEBUG ${FBX_LIBNAME})
-ELSE()
-    SET(FBX_LIBNAME_DEBUG ${FBX_LIBNAME}d)
-ENDIF()
-
-# SET final path
-#osg_fbx code is compatible with 2011.2, 2011.3 and 2011.3.1 so find any directory
-SET( FBX_SEARCH_PATHS
-    $ENV{FBX_DIR}
-    $ENV{ProgramW6432}/Autodesk/FBX/FbxSdk/2011.3.1
-    $ENV{PROGRAMFILES}/Autodesk/FBX/FbxSdk/2011.3.1
-    /Applications/Autodesk/FBXSDK201131
-    $ENV{ProgramW6432}/Autodesk/FBX/FbxSdk/2011.3
-    $ENV{PROGRAMFILES}/Autodesk/FBX/FbxSdk/2011.3
-    /Applications/Autodesk/FBXSDK20113
-    $ENV{ProgramW6432}/Autodesk/FBX/FbxSdk/2011.2
-    $ENV{PROGRAMFILES}/Autodesk/FBX/FbxSdk/2011.2
-    /Applications/Autodesk/FBXSDK20112
-)
-
-# search for headers & debug/release libraries
-FIND_PATH(FBX_INCLUDE_DIR fbxsdk.h
-    PATHS ${FBX_SEARCH_PATHS}
-    PATH_SUFFIXES include )
-FIND_LIBRARY( FBX_LIBRARY ${FBX_LIBNAME}
-    PATHS ${FBX_SEARCH_PATHS}
-    PATH_SUFFIXES lib)
-FIND_LIBRARY( FBX_LIBRARY_DEBUG ${FBX_LIBNAME_DEBUG}
-    PATHS ${FBX_SEARCH_PATHS}
-    PATH_SUFFIXES lib)
-
-IF(FBX_LIBRARY AND FBX_LIBRARY_DEBUG AND FBX_INCLUDE_DIR)
-    SET(FBX_FOUND "YES")
-ELSE()
-    SET(FBX_FOUND "NO")
-ENDIF()
+findpkg_finish(FBX)

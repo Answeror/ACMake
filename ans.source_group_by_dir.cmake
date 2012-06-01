@@ -1,3 +1,6 @@
+# warning: use `acmake_group_source` instead, this file may be removed in the
+#   future
+
 include(ans.parse_arguments)
 
 macro(source_group_by_dir source_files)

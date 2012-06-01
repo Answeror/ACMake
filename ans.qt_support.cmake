@@ -1,3 +1,5 @@
+# warning: don't use this, use acmake_qt_support instead
+
 include(ans.parse_arguments)
 
 macro(filter_files_contain pattern out_var in_var)
