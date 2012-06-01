@@ -1,10 +1,7 @@
-include(ans.env)
-include(ans.expand_find_package_hints)
+include(acmake_common)
 
-# environment variable CML_DIR must be set first
 function(cml_support)
-    expand_find_package_hints(CML)
-    find_package(CML REQUIRED HINTS ${CML_FIND_PACKAGE_HINTS})
+    find_package(CML REQUIRED)
     #include_directories(${CML_INCLUDE_DIRS})
     include(${CML_USE_FILE})
     add_definitions(
