@@ -1,10 +1,10 @@
 include(acmake_common)
-include(acmake_assert)
+include(acmake_mysql_support)
 
 # usage: acmake_mysqlpp_support(<target>)
 macro(acmake_mysqlpp_support TARGET)
-    acmake_assert(ACMAKE_SDK_PATH)
-    find_package(MySqlpp REQUIRED PATHS "${ACMAKE_SDK_PATH}")
+    acmake_mysql_support(${TARGET})
+    find_package(MySqlpp REQUIRED)
     include_directories(${MYSQLPP_INCLUDE_DIRS})
     target_link_libraries(${TARGET} ${MYSQLPP_LIBRARIES})
 endmacro()
