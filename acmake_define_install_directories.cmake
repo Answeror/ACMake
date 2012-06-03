@@ -7,6 +7,8 @@ include(acmake_parse_arguments)
 #   [<name>_]INSTALL_RUNTIME_DIR 
 #   [<name>_]INSTALL_INCLUDE_DIR 
 #   [<name>_]INSTALL_CMAKE_DIR 
+#   [<name>_]INCLUDE_RELATIVE_TO_CMAKE 
+#   [<name>_]ARCHIVE_RELATIVE_TO_CMAKE 
 # see <http://www.vtk.org/Wiki/CMake/Tutorials/How_to_create_a_ProjectConfig.cmake_file>
 # for details
 macro(acmake_define_install_directories)
@@ -39,4 +41,13 @@ macro(acmake_define_install_directories)
             set(${var} "${CMAKE_INSTALL_PREFIX}/${${var}}")
         endif()
     endforeach()
+
+    file(RELATIVE_PATH
+        ${ACMAKE_DEFINE_INSTALL_DIRECTORIES_PREFIX}INCLUDE_RELATIVE_TO_CMAKE
+        "${${ACMAKE_DEFINE_INSTALL_DIRECTORIES_PREFIX}INSTALL_CMAKE_DIR}"
+        "${${ACMAKE_DEFINE_INSTALL_DIRECTORIES_PREFIX}INSTALL_INCLUDE_DIR}")
+    file(RELATIVE_PATH
+        ${ACMAKE_DEFINE_INSTALL_DIRECTORIES_PREFIX}ARCHIVE_RELATIVE_TO_CMAKE
+        "${${ACMAKE_DEFINE_INSTALL_DIRECTORIES_PREFIX}INSTALL_CMAKE_DIR}"
+        "${${ACMAKE_DEFINE_INSTALL_DIRECTORIES_PREFIX}INSTALL_ARCHIVE_DIR}")
 endmacro()
