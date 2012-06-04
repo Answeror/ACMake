@@ -24,13 +24,13 @@ endmacro(source_group_by_dir)
 #   group_source([RELATIVE path] source1 source2 ...)
 macro(group_source)
     PARSE_ARGUMENTS(GROUP_SOURCE
-        ""
         "RELATIVE"
+        ""
         ${ARGN}
         )
     if(GROUP_SOURCE_RELATIVE)
-        CAR(BASE_DIR ${GROUP_SOURCE_DEFAULT_ARGS})
-        CDR(source_files ${GROUP_SOURCE_DEFAULT_ARGS})
+        set(BASE_DIR ${GROUP_SOURCE_RELATIVE})
+        set(source_files ${GROUP_SOURCE_DEFAULT_ARGS})
         foreach(sgbd_file ${source_files})
             file(RELATIVE_PATH sgbd_fpath "${BASE_DIR}" "${sgbd_file}")
             string(REGEX REPLACE "\(.*\)/.*" \\1 sgbd_group_name ${sgbd_fpath})
