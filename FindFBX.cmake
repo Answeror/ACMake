@@ -42,6 +42,8 @@ if(MSVC)
             make_library_set(FBX_LIBRARY)
         endif()
     endif()
+
+    #set(FBX_DEFINITIONS -DKFBX_DLLINFO)
 endif()
 
 findpkg_finish(FBX)

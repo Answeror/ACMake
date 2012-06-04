@@ -3,6 +3,6 @@
 macro(acmake_fbx_support TARGET)
     find_package(FBX REQUIRED)
     include_directories(${FBX_INCLUDE_DIRS})
-    message("asdf ${FBX_LIBRARIES}")
     target_link_libraries(${TARGET} ${FBX_LIBRARIES})
+    add_definitions(${FBX_DEFINITIONS})
 endmacro()
