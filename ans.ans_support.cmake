@@ -1,8 +1,6 @@
-include(ans.env)
-include(ans.expand_find_package_hints)
+include(acmake_common)
 
 function(ans_support)
-    expand_find_package_hints(Ans)
-    find_package(Ans REQUIRED HINTS ${Ans_FIND_PACKAGE_HINTS})
+    find_package(Ans REQUIRED)
     include_directories(${ANS_INCLUDE_DIRS})
 endfunction()
