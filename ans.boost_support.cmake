@@ -41,6 +41,14 @@ macro(boost_support)
             )
         link_directories(${Boost_LIBRARY_DIRS})
         target_link_libraries("${BOOST_SUPPORT_TARGET}" ${Boost_LIBRARIES})
+
+        # use shared library in unit test {{{
+        list(FIND BOOST_SUPPORT_COMPONENTS unit_test_framework
+            BOOST_SUPPORT_UNIT_TEST)
+        if(NOT "${BOOST_SUPPORT_UNIT_TEST}" EQUAL "-1")
+            add_definitions(-DBOOST_TEST_DYN_LINK)
+        endif()
+        # }}}
     else()
         # head only support
         find_package(Boost REQUIRED)
