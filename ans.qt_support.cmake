@@ -15,46 +15,46 @@ macro(filter_files_contain pattern out_var in_var)
 endmacro()
 
 MACRO(qt_support)
-    PARSE_ARGUMENTS(
-        QT_SUPPORT
-        "HEADER;UI;RESOURSE"
-        ""
-        ${ARGN}
-        )
-    CAR(qt_files ${QT_SUPPORT_DEFAULT_ARGS})
-    CDR(QT_SUPPORT_REST ${QT_SUPPORT_DEFAULT_ARGS})
-    CAR(qt_libraries ${QT_SUPPORT_REST})
-
-    SET(project_name ${PROJECT_NAME})
-
     FIND_PACKAGE(Qt REQUIRED)
-    
     SET(QT_USE_QTOPENGL 1) # don't forget this
     SET(QT_USE_QTSQL 1)
     INCLUDE(${QT_USE_FILE})
 
-    #FILE(GLOB_RECURSE ${project_name}_source *.cpp)
-    FILE(GLOB_RECURSE ${project_name}_header *.h *.hpp)
-    FILE(GLOB_RECURSE ${project_name}_ui *.ui)
-    FILE(GLOB_RECURSE ${project_name}_resource *.qrc)
-    list(APPEND ${project_name}_header ${QT_SUPPORT_HEADER})
-    list(APPEND ${project_name}_ui ${QT_SUPPORT_UI})
-    list(APPEND ${project_name}_resource ${QT_SUPPORT_RESOURCE})
+    if(${ARGC} GREATER 0)
+        PARSE_ARGUMENTS(
+            QT_SUPPORT
+            "HEADER;UI;RESOURSE"
+            ""
+            ${ARGN}
+            )
+        CAR(qt_files ${QT_SUPPORT_DEFAULT_ARGS})
+        CDR(QT_SUPPORT_REST ${QT_SUPPORT_DEFAULT_ARGS})
+        CAR(qt_libraries ${QT_SUPPORT_REST})
 
-    filter_files_contain(".*Q_OBJECT.*" ${project_name}_header ${project_name}_header)
+        SET(project_name ${PROJECT_NAME})
 
-    QT4_WRAP_UI(${project_name}_ui_source ${${project_name}_ui})
-    INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}) #let cmake find generated ui source
-    QT4_WRAP_CPP(${project_name}_moc_source ${${project_name}_header})
-    QT4_ADD_RESOURCES(${project_name}_resource_source ${${project_name}_resource})
+        #FILE(GLOB_RECURSE ${project_name}_source *.cpp)
+        FILE(GLOB_RECURSE ${project_name}_header *.h *.hpp)
+        FILE(GLOB_RECURSE ${project_name}_ui *.ui)
+        FILE(GLOB_RECURSE ${project_name}_resource *.qrc)
+        list(APPEND ${project_name}_header ${QT_SUPPORT_HEADER})
+        list(APPEND ${project_name}_ui ${QT_SUPPORT_UI})
+        list(APPEND ${project_name}_resource ${QT_SUPPORT_RESOURCE})
 
-    SET(${project_name}_qt_generated ${${project_name}_ui_source} ${${project_name}_moc_source} ${${project_name}_resource_source})
+        filter_files_contain(".*Q_OBJECT.*" ${project_name}_header ${project_name}_header)
 
-    SOURCE_GROUP("Qt Generated" FILES ${${project_name}_qt_generated})
+        QT4_WRAP_UI(${project_name}_ui_source ${${project_name}_ui})
+        INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}) #let cmake find generated ui source
+        QT4_WRAP_CPP(${project_name}_moc_source ${${project_name}_header})
+        QT4_ADD_RESOURCES(${project_name}_resource_source ${${project_name}_resource})
 
-    #SET(${qt_files} ${${project_name}_source} ${${project_name}_header} ${${project_name}_qt_generated})
-    SET(${qt_files} ${${project_name}_qt_generated})
+        SET(${project_name}_qt_generated ${${project_name}_ui_source} ${${project_name}_moc_source} ${${project_name}_resource_source})
 
-    SET(${qt_libraries} ${QT_LIBRARIES})
+        SOURCE_GROUP("Qt Generated" FILES ${${project_name}_qt_generated})
 
+        #SET(${qt_files} ${${project_name}_source} ${${project_name}_header} ${${project_name}_qt_generated})
+        SET(${qt_files} ${${project_name}_qt_generated})
+
+        SET(${qt_libraries} ${QT_LIBRARIES})
+    endif()
 ENDMACRO(qt_support)
