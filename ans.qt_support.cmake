@@ -15,18 +15,17 @@ macro(filter_files_contain pattern out_var in_var)
 endmacro()
 
 MACRO(qt_support)
-    FIND_PACKAGE(Qt REQUIRED)
-    SET(QT_USE_QTOPENGL 1) # don't forget this
-    SET(QT_USE_QTSQL 1)
+    PARSE_ARGUMENTS(
+        QT_SUPPORT
+        "HEADER;UI;RESOURSE;COMPONENTS;VERSION"
+        ""
+        ${ARGN}
+        )
+
+    FIND_PACKAGE(Qt4 ${QT_SUPPORT_VERSION} REQUIRED ${QT_SUPPORT_COMPONENTS})
     INCLUDE(${QT_USE_FILE})
 
     if(${ARGC} GREATER 0)
-        PARSE_ARGUMENTS(
-            QT_SUPPORT
-            "HEADER;UI;RESOURSE"
-            ""
-            ${ARGN}
-            )
         CAR(qt_files ${QT_SUPPORT_DEFAULT_ARGS})
         CDR(QT_SUPPORT_REST ${QT_SUPPORT_DEFAULT_ARGS})
         CAR(qt_libraries ${QT_SUPPORT_REST})
