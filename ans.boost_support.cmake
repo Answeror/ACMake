@@ -88,7 +88,7 @@ endmacro()
 # decltype will be supported under MSVC10
 macro(boost_config)
     # decltype
-    if(MSVC10)
+    if(MSVC10 OR MSVC11)
         add_definitions(-DBOOST_RESULT_OF_USE_DECLTYPE)
     endif()
     # disable auto link on windows, use dynamic boost lib instead
