@@ -1,4 +1,14 @@
 include(ans.boost_support)
+include(acmake_assert)
+
+set(BOOST_HOME CACHE PATH "Boost home path.")
+if($ENV{BOOST_HOME})
+    set(BOOST_HOME $ENV{BOOST_HOME})
+elseif($ENV{BOOST_ROOT})
+    set(BOOST_HOME $ENV{BOOST_ROOT})
+endif()
+acmake_assert(BOOST_HOME)
+list(APPEND CMAKE_PREFIX_PATH ${BOOST_HOME})
 
 # Include [and/or link] with boost.
 # 

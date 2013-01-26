@@ -1,5 +1,14 @@
 include(ans.ans_support)
 
+set(ANS_HOME CACHE PATH "Ans home path.")
+if($ENV{ANS_HOME})
+    set(ANS_HOME $ENV{ANS_HOME})
+elseif($ENV{ANS_ROOT})
+    set(ANS_HOME $ENV{ANS_ROOT})
+endif()
+acmake_assert(ANS_HOME)
+list(APPEND CMAKE_PREFIX_PATH ${ANS_HOME})
+
 # usage: acmake_ans_support(<target>)
 macro(acmake_ans_support)
     ans_support(${ARGN})

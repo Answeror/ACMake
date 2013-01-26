@@ -1,0 +1,11 @@
+set(OPENCV_HOME $ENV{OpenCV_DIR} CACHE PATH "OpenCV home path.")
+if(NOT OPENCV_HOME)
+    message(FATAL_ERROR "Please define cache variable OPENCV_HOME.")
+endif()
+list(APPEND CMAKE_PREFIX_PATH ${OPENCV_HOME})
+
+macro(acmake_opencv_support TARGET)
+    find_package(OpenCV REQUIRED)
+    link_directories(${OpenCV_LIB_DIR})
+    target_link_libraries(${TARGET} ${OpenCV_LIBS})
+endmacro()
