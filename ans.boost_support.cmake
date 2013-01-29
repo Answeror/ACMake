@@ -14,14 +14,16 @@ include(ans.parse_arguments)
 macro(boost_support)
     parse_arguments(
         BOOST_SUPPORT
-        "COMPONENTS"
-        "STATIC;SHARED"
+        "COMPONENTS;WORKING_DIRECTORY"
+        "STATIC;SHARED;COPY_DLL"
         ${ARGN}
         )
     car(BOOST_SUPPORT_TARGET ${BOOST_SUPPORT_DEFAULT_ARGS})
     if(BOOST_SUPPORT_STATIC)
         set(Boost_USE_STATIC_LIBS ON)
     else()
+        # use shared library by default
+        set(BOOST_SUPPORT_SHARED TRUE)
         set(Boost_USE_STATIC_LIBS OFF)
         # use shared library in unit test {{{
         list(FIND BOOST_SUPPORT_COMPONENTS unit_test_framework
@@ -52,6 +54,35 @@ macro(boost_support)
             )
         link_directories(${Boost_LIBRARY_DIRS})
         target_link_libraries("${BOOST_SUPPORT_TARGET}" ${Boost_LIBRARIES})
+
+        # copy dll
+        if(BOOST_SUPPORT_SHARED)
+            if(BOOST_SUPPORT_COPY_DLL)
+                if(NOT BOOST_SUPPORT_WORKING_DIRECTORY)
+                    get_property(${BOOST_SUPPORT_TARGET}_TYPE TARGET ${BOOST_SUPPORT_TARGET} PROPERTY TYPE)
+                    if(${BOOST_SUPPORT_TARGET}_TYPE MATCHES "EXECUTABLE")
+                        set(BOOST_SUPPORT_WORKING_DIRECTORY $<TARGET_FILE_DIR:${BOOST_SUPPORT_TARGET}>)
+                    else()
+                        set(BOOST_SUPPORT_WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+                    endif()
+                endif()
+                foreach(LIB ${Boost_LIBRARIES})
+                    if(NOT LIB MATCHES debug)
+                        if(NOT LIB MATCHES optimized)
+                            message("${LIB}")
+                            string(REPLACE ".lib" ".dll" DLL ${LIB})
+                            add_custom_command(
+                                TARGET ${BOOST_SUPPORT_TARGET}
+                                POST_BUILD
+                                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                    ${DLL}
+                                    ${BOOST_SUPPORT_WORKING_DIRECTORY}
+                                )
+                        endif()
+                    endif()
+                endforeach()
+            endif()
+        endif()
     else()
         # head only support
         find_package(Boost REQUIRED)
