@@ -15,17 +15,28 @@ macro(boost_support)
     parse_arguments(
         BOOST_SUPPORT
         "COMPONENTS"
-        ""
+        "STATIC;SHARED"
         ${ARGN}
         )
     car(BOOST_SUPPORT_TARGET ${BOOST_SUPPORT_DEFAULT_ARGS})
-    set(Boost_USE_STATIC_LIBS OFF)
+    if(BOOST_SUPPORT_STATIC)
+        set(Boost_USE_STATIC_LIBS ON)
+    else()
+        set(Boost_USE_STATIC_LIBS OFF)
+        # use shared library in unit test {{{
+        list(FIND BOOST_SUPPORT_COMPONENTS unit_test_framework
+            BOOST_SUPPORT_UNIT_TEST)
+        if(NOT "${BOOST_SUPPORT_UNIT_TEST}" EQUAL "-1")
+            add_definitions(-DBOOST_TEST_DYN_LINK)
+        endif()
+        # }}}
+    endif()
     set(Boost_USE_MULTITHREADED ON)
     if(BOOST_SUPPORT_COMPONENTS)
         if (NOT BOOST_SUPPORT_TARGET)
             message(FATAL_ERROR "Target must be specified.")
         endif()
-        find_package(Boost COMPONENTS
+        find_package(Boost REQUIRED COMPONENTS
             ${BOOST_SUPPORT_COMPONENTS}
             #date_time
             #filesystem
@@ -41,14 +52,6 @@ macro(boost_support)
             )
         link_directories(${Boost_LIBRARY_DIRS})
         target_link_libraries("${BOOST_SUPPORT_TARGET}" ${Boost_LIBRARIES})
-
-        # use shared library in unit test {{{
-        list(FIND BOOST_SUPPORT_COMPONENTS unit_test_framework
-            BOOST_SUPPORT_UNIT_TEST)
-        if(NOT "${BOOST_SUPPORT_UNIT_TEST}" EQUAL "-1")
-            add_definitions(-DBOOST_TEST_DYN_LINK)
-        endif()
-        # }}}
     else()
         # head only support
         find_package(Boost REQUIRED)
