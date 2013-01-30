@@ -2,6 +2,7 @@
 
 include(ans.env)
 include(ans.parse_arguments)
+include(acmake_copy_dll)
 
 
 # Include [and link] with boost.
@@ -58,29 +59,11 @@ macro(boost_support)
         # copy dll
         if(BOOST_SUPPORT_SHARED)
             if(BOOST_SUPPORT_COPY_DLL)
-                if(NOT BOOST_SUPPORT_WORKING_DIRECTORY)
-                    get_property(${BOOST_SUPPORT_TARGET}_TYPE TARGET ${BOOST_SUPPORT_TARGET} PROPERTY TYPE)
-                    if(${BOOST_SUPPORT_TARGET}_TYPE MATCHES "EXECUTABLE")
-                        set(BOOST_SUPPORT_WORKING_DIRECTORY $<TARGET_FILE_DIR:${BOOST_SUPPORT_TARGET}>)
-                    else()
-                        set(BOOST_SUPPORT_WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-                    endif()
-                endif()
-                foreach(LIB ${Boost_LIBRARIES})
-                    if(NOT LIB MATCHES debug)
-                        if(NOT LIB MATCHES optimized)
-                            message("${LIB}")
-                            string(REPLACE ".lib" ".dll" DLL ${LIB})
-                            add_custom_command(
-                                TARGET ${BOOST_SUPPORT_TARGET}
-                                POST_BUILD
-                                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                                    ${DLL}
-                                    ${BOOST_SUPPORT_WORKING_DIRECTORY}
-                                )
-                        endif()
-                    endif()
-                endforeach()
+                acmake_copy_dll(
+                    TARGET ${BOOST_SUPPORT_TARGET}
+                    WORKING_DIRECTORY ${BOOST_SUPPORT_WORKING_DIRECTORY}
+                    LIBRARIES ${Boost_LIBRARIES}
+                    )
             endif()
         endif()
     else()
