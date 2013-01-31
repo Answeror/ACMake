@@ -49,7 +49,8 @@ MACRO(qt_support)
         list(APPEND ${project_name}_ui ${QT_SUPPORT_UI})
         list(APPEND ${project_name}_resource ${QT_SUPPORT_RESOURCE})
 
-        filter_files_contain(".*Q_OBJECT.*" ${project_name}_header ${project_name}_header)
+        filter_files_contain(".*Q_OBJECT.*" ${project_name}_header_temp ${project_name}_header)
+        set(${project_name}_header ${${project_name}_header_temp})
 
         QT4_WRAP_UI(${project_name}_ui_source ${${project_name}_ui})
         INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR}) #let cmake find generated ui source
