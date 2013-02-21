@@ -75,10 +75,9 @@ macro(boost_support)
     include_directories(${Boost_INCLUDE_DIRS})
 
     # try to find extensions
-    find_package(OvenToBoost)
-    if(OVEN_TO_BOOST_FOUND)
-        #message("${OVEN_TO_BOOST_INCLUDE_DIRS}")
-        include_directories(${OVEN_TO_BOOST_INCLUDE_DIRS})
+    if(OVEN_TO_BOOST_HOME)
+        message("Found OvenToBoost.")
+        include_directories(${OVEN_TO_BOOST_HOME})
     endif()
 endmacro()
 
