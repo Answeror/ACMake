@@ -3,6 +3,8 @@
 include(ans.env)
 include(ans.parse_arguments)
 include(acmake_copy_dll)
+include(acmake_error)
+include(acmake_find_package)
 
 
 # Include [and link] with boost.
@@ -15,11 +17,29 @@ include(acmake_copy_dll)
 macro(boost_support)
     parse_arguments(
         BOOST_SUPPORT
-        "COMPONENTS;WORKING_DIRECTORY"
+        "COMPONENTS;WORKING_DIRECTORY;THREAD"
         "STATIC;SHARED;COPY_DLL"
         ${ARGN}
         )
     car(BOOST_SUPPORT_TARGET ${BOOST_SUPPORT_DEFAULT_ARGS})
+    # threading {{{
+    if(NOT BOOST_SUPPORT_THREAD)
+        set(Boost_USE_MULTITHREADED ON)
+    elseif("${BOOST_SUPPORT_THREAD}" EQUAL "SINGLE")
+        set(Boost_USE_MULTITHREADED OFF)
+    elseif("${BOOST_SUPPORT_THREAD}" EQUAL "MULTI")
+        set(Boost_USE_MULTITHREADED ON)
+    else()
+        acmake_error("Known threading option: %{BOOST_SUPPORT_THREAD}")
+    endif()
+    # }}}
+    if(ANDROID)
+        # FindBoost.cmake cannot determine compiler on windows
+        set(Boost_COMPILER -gcc)
+        set(Boost_USE_STATIC_RUNTIME ON)
+    else()
+        set(Boost_USE_STATIC_RUNTIME OFF)
+    endif()
     if(BOOST_SUPPORT_STATIC)
         set(Boost_USE_STATIC_LIBS ON)
     else()
@@ -39,19 +59,11 @@ macro(boost_support)
         if (NOT BOOST_SUPPORT_TARGET)
             message(FATAL_ERROR "Target must be specified.")
         endif()
-        find_package(Boost REQUIRED COMPONENTS
+        acmake_find_package(
+            Boost
+            REQUIRED
+            COMPONENTS
             ${BOOST_SUPPORT_COMPONENTS}
-            #date_time
-            #filesystem
-            #graph
-            #iostreams
-            #regex
-            #serialization
-            #signals
-            #system
-            #thread
-            #unit_test_framework
-            #wave
             )
         link_directories(${Boost_LIBRARY_DIRS})
         target_link_libraries("${BOOST_SUPPORT_TARGET}" ${Boost_LIBRARIES})
@@ -68,7 +80,7 @@ macro(boost_support)
         endif()
     else()
         # head only support
-        find_package(Boost REQUIRED)
+        acmake_find_package(Boost REQUIRED)
     endif()
 
     boost_config()
@@ -87,11 +99,11 @@ macro(boost_header_only_support)
     if(NOT ANS_BOOST_HEADER_ONLY_SUPPORTED)
         set(Boost_USE_STATIC_LIBS OFF)
         set(Boost_USE_MULTITHREADED ON)
-        find_package(Boost REQUIRED)
+        acmake_find_package(Boost REQUIRED)
         include_directories(${Boost_INCLUDE_DIRS})
         boost_config()
         # try to find extensions
-        find_package(OvenToBoost)
+        acmake_find_package(OvenToBoost)
         if(OVEN_TO_BOOST_FOUND)
             #message("${OVEN_TO_BOOST_INCLUDE_DIRS}")
             include_directories(${OVEN_TO_BOOST_INCLUDE_DIRS})

@@ -1,6 +1,7 @@
 # warning: do not use this directly, use acmake_xxx_support instead
 
 include(acmake_common)
+include(acmake_find_package)
 
 # usage: acmake_simple_support(<target> <library>)
 # 
@@ -13,7 +14,7 @@ macro(acmake_simple_support TARGET LIBRARY)
     if(EXISTS "${${UPPER_LIBRARY}_HOME}")
         list(APPEND CMAKE_PREFIX_PATH "${${UPPER_LIBRARY}_HOME}")
     endif()
-    find_package(${LIBRARY} REQUIRED)
+    acmake_find_package(${LIBRARY} REQUIRED)
     if(${LIBRARY}_INCLUDE_DIRS)
         include_directories(${${LIBRARY}_INCLUDE_DIRS})
     endif()
