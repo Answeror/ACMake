@@ -1,7 +1,8 @@
 include(acmake_common)
+include(acmake_find_package)
 
 function(cml_support)
-    find_package(CML REQUIRED)
+    acmake_find_package(CML REQUIRED)
     #include_directories(${CML_INCLUDE_DIRS})
     include(${CML_USE_FILE})
     add_definitions(

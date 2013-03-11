@@ -5,6 +5,7 @@ include(ans.parse_arguments)
 include(acmake_copy_dll)
 include(acmake_error)
 include(acmake_find_package)
+include(acmake_target_platform)
 
 
 # Include [and link] with boost.
@@ -18,7 +19,7 @@ macro(boost_support)
     parse_arguments(
         BOOST_SUPPORT
         "COMPONENTS;WORKING_DIRECTORY;THREAD"
-        "STATIC;SHARED;COPY_DLL"
+        "STATIC;SHARED;COPY_DLL;COPY_SHARED"
         ${ARGN}
         )
     car(BOOST_SUPPORT_TARGET ${BOOST_SUPPORT_DEFAULT_ARGS})
@@ -70,12 +71,15 @@ macro(boost_support)
 
         # copy dll
         if(BOOST_SUPPORT_SHARED)
-            if(BOOST_SUPPORT_COPY_DLL)
-                acmake_copy_dll(
-                    TARGET ${BOOST_SUPPORT_TARGET}
-                    WORKING_DIRECTORY ${BOOST_SUPPORT_WORKING_DIRECTORY}
-                    LIBRARIES ${Boost_LIBRARIES}
-                    )
+            if(BOOST_SUPPORT_COPY_DLL OR BOOST_SUPPORT_COPY_SHARED)
+                acmake_target_platform()
+                if(ACMAKE_TARGET_PLATFORM_WINDOWS)
+                    acmake_copy_dll(
+                        TARGET ${BOOST_SUPPORT_TARGET}
+                        WORKING_DIRECTORY ${BOOST_SUPPORT_WORKING_DIRECTORY}
+                        LIBRARIES ${Boost_LIBRARIES}
+                        )
+                endif()
             endif()
         endif()
     else()
