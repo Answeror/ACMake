@@ -7,7 +7,7 @@ include(acmake_warning)
 macro(acmake_copy_dll)
     parse_arguments(
         ACMAKE_COPY_DLL
-        "TARGET;WORKING_DIRECTORY;LIBRARIES"
+        "TARGET;WORKING_DIRECTORY;LIBRARIES;DLLS;DLLS_DEBUG;DLLS_RELEASE"
         "DEBUG"
         ${ARGN}
         )
@@ -18,7 +18,14 @@ macro(acmake_copy_dll)
         acmake_warning("Target platform isn't windows.")
     else()
         # get dll path from lib path
-        acmake_get_dll(ACMAKE_COPY_DLL_DLLS ${ACMAKE_COPY_DLL_LIBRARIES})
+        if(ACMAKE_COPY_DLL_LIBRARIES)
+            acmake_get_dll(
+                ACMAKE_COPY_DLL_DLLS
+                ACMAKE_COPY_DLL_DLLS_DEBUG
+                ACMAKE_COPY_DLL_DLLS_RELEASE
+                ${ACMAKE_COPY_DLL_LIBRARIES}
+            )
+        endif()
 
         if(ACMAKE_COPY_DLL_DEBUG)
             message("ACMAKE_COPY_DLL_LIBRARIES: ${ACMAKE_COPY_DLL_LIBRARIES}")
@@ -32,17 +39,22 @@ macro(acmake_copy_dll)
             )
 
         if(ACMAKE_COPY_DLL_DEBUG)
-            message("ACMAKE_COPY_DLL_WORKING_DIRECTORY: ${ACMAKE_COPY_DLL_WORKING_DIRECTORY}")
+            message("ACMAKE_COPY_DLL_WORKING_DIRECTORY_DEBUG: ${ACMAKE_COPY_DLL_WORKING_DIRECTORY_DEBUG}")
+            message("ACMAKE_COPY_DLL_WORKING_DIRECTORY_RELEASE: ${ACMAKE_COPY_DLL_WORKING_DIRECTORY_RELEASE}")
         endif()
 
-        foreach(DLL ${ACMAKE_COPY_DLL_DLLS})
-            add_custom_command(
-                TARGET ${ACMAKE_COPY_DLL_TARGET}
-                POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                ${DLL}
-                ${ACMAKE_COPY_DLL_WORKING_DIRECTORY}
-                )
+        foreach(SUFFIX _DEBUG _RELEASE)
+            if(ACMAKE_COPY_DLL_WORKING_DIRECTORY${SUFFIX})
+                foreach(DLL ${ACMAKE_COPY_DLL_DLLS} ${ACMAKE_COPY_DLL_DLLS${SUFFIX}})
+                    add_custom_command(
+                        TARGET ${ACMAKE_COPY_DLL_TARGET}
+                        POST_BUILD
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                            ${DLL}
+                            ${ACMAKE_COPY_DLL_WORKING_DIRECTORY${SUFFIX}}
+                    )
+                endforeach()
+            endif()
         endforeach()
     endif()
 endmacro()
