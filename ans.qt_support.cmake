@@ -19,7 +19,7 @@ MACRO(qt_support)
     PARSE_ARGUMENTS(
         QT_SUPPORT
         "HEADER;UI;RESOURSE;COMPONENTS;VERSION;WORKING_DIRECTORY"
-        "COPY_DLL"
+        "COPY_DLL;COPY_SHARED"
         ${ARGN}
         )
 
@@ -75,7 +75,7 @@ MACRO(qt_support)
             else()
                 target_link_libraries(${QT_SUPPORT_TARGET} ${QT_LIBRARIES})
             endif()
-            if(QT_SUPPORT_COPY_DLL)
+            if(QT_SUPPORT_COPY_DLL OR QT_SUPPORT_COPY_SHARED)
                 acmake_copy_dll(
                     TARGET ${QT_SUPPORT_TARGET}
                     WORKING_DIRECTORY ${QT_SUPPORT_WORKING_DIRECTORY}
