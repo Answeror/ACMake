@@ -30,6 +30,8 @@ macro(acmake_copy_dll)
         if(ACMAKE_COPY_DLL_DEBUG)
             message("ACMAKE_COPY_DLL_LIBRARIES: ${ACMAKE_COPY_DLL_LIBRARIES}")
             message("ACMAKE_COPY_DLL_DLLS: ${ACMAKE_COPY_DLL_DLLS}")
+            message("ACMAKE_COPY_DLL_DLLS_RELEASE: ${ACMAKE_COPY_DLL_DLLS_RELEASE}")
+            message("ACMAKE_COPY_DLL_DLLS_DEBUG: ${ACMAKE_COPY_DLL_DLLS_DEBUG}")
         endif()
 
         # fill working directory if necessary
