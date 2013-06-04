@@ -57,6 +57,11 @@ if(NOT ACMAKE_BOOST_SUPPORT_INCLUDED)
             if(NOT "${BOOST_SUPPORT_UNIT_TEST}" EQUAL "-1")
                 add_definitions(-DBOOST_TEST_DYN_LINK)
             endif()
+            list(FIND BOOST_SUPPORT_COMPONENTS program_options
+                BOOST_SUPPORT_PROGRAM_OPTIONS)
+            if(NOT "${BOOST_SUPPORT_PROGRAM_OPTIONS}" EQUAL "-1")
+                add_definitions(-DBOOST_PROGRAM_OPTIONS_DYN_LINK)
+            endif()
             # }}}
         endif()
         set(Boost_USE_MULTITHREADED ON)
