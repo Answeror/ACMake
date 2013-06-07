@@ -10,6 +10,7 @@ if(NOT ACMAKE_BOOST_SUPPORT_INCLUDED)
     include(acmake_find_package)
     include(acmake_target_platform)
     include(${CMAKE_CURRENT_LIST_DIR}/cmake_cxx11/CheckCXX11Features.cmake)
+    include(acmake_append_runtime_dirs)
     
     
     # Include [and link] with boost.
@@ -81,14 +82,7 @@ if(NOT ACMAKE_BOOST_SUPPORT_INCLUDED)
             # copy dll
             if(BOOST_SUPPORT_SHARED)
                 if(BOOST_SUPPORT_COPY_DLL OR BOOST_SUPPORT_COPY_SHARED)
-                    acmake_target_platform()
-                    if(ACMAKE_TARGET_PLATFORM_WINDOWS)
-                        acmake_copy_dll(
-                            TARGET ${BOOST_SUPPORT_TARGET}
-                            WORKING_DIRECTORY ${BOOST_SUPPORT_WORKING_DIRECTORY}
-                            LIBRARIES ${Boost_LIBRARIES}
-                            )
-                    endif()
+                    acmake_append_runtime_dirs(${BOOST_SUPPORT_TARGET} ${Boost_LIBRARY_DIRS})
                 endif()
             endif()
         else()

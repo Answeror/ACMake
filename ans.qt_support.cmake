@@ -2,6 +2,7 @@
 
 include(ans.parse_arguments)
 include(acmake_copy_dll)
+include(acmake_append_runtime_dirs)
 
 macro(filter_files_contain pattern out_var in_var)
     set(${out_var}_temp)
@@ -76,11 +77,7 @@ MACRO(qt_support)
                 target_link_libraries(${QT_SUPPORT_TARGET} ${QT_LIBRARIES})
             endif()
             if(QT_SUPPORT_COPY_DLL OR QT_SUPPORT_COPY_SHARED)
-                acmake_copy_dll(
-                    TARGET ${QT_SUPPORT_TARGET}
-                    WORKING_DIRECTORY ${QT_SUPPORT_WORKING_DIRECTORY}
-                    LIBRARIES ${QT_LIBRARIES}
-                    )
+                acmake_append_runtime_dirs(${QT_SUPPORT_TARGET} ${QT_BINARY_DIR})
             endif()
         endif()
     endif()
