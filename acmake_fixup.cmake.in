@@ -1,7 +1,16 @@
 include(BundleUtilities)
-message("FOO ${TARGET_FILE_PATH}")
+
 if(TARGET_FILE_PATH MATCHES exe$)
     fixup_bundle("${TARGET_FILE_PATH}" "" "@RUNTIME_DIRS@")
 elseif(TARGET_FILE_PATH MATCHES lib$)
     fixup_bundle("" "${TARGET_FILE_PATH}" "@RUNTIME_DIRS@")
 endif()
+
+set(RUNTIME_DEBUG @RUNTIME_DEBUG@)
+set(RUNTIME_RELEASE @RUNTIME_RELEASE@)
+
+string(TOUPPER ${CMAKE_BUILD_TYPE} CONFIG)
+get_filename_component(TARGET_FILE_DIR ${TARGET_FILE_PATH} PATH)
+foreach(LIB ${RUNTIME_${CONFIG}})
+    execute_process(COMMAND ${CMAKE_COMMAND} -E copy_if_different ${LIB} ${TARGET_FILE_DIR})
+endforeach()
