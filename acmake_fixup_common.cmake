@@ -1,3 +1,5 @@
+include(${CMAKE_CURRENT_LIST_DIR}/acmake_assert.cmake)
+
 if(TARGET_FILE_PATH MATCHES exe$)
     fixup_bundle("${TARGET_FILE_PATH}" "" "${RUNTIME_DIRS}")
 elseif(TARGET_FILE_PATH MATCHES lib$)
@@ -5,8 +7,11 @@ elseif(TARGET_FILE_PATH MATCHES lib$)
 endif()
 
 string(TOUPPER ${CMAKE_BUILD_TYPE} CONFIG)
-get_filename_component(TARGET_FILE_DIR ${TARGET_FILE_PATH} PATH)
+string(REPLACE "\${CMAKE_INSTALL_PREFIX}" "${CMAKE_INSTALL_PREFIX}" TARGET_FILE_PATH_REP ${TARGET_FILE_PATH})
+get_filename_component(TARGET_FILE_DIR ${TARGET_FILE_PATH_REP} PATH)
 foreach(LIB ${RUNTIME} ${RUNTIME_${CONFIG}})
+    message("copying ${LIB}")
+    acmake_assert_exists(${LIB})
     if(IS_DIRECTORY "${LIB}")
         get_filename_component(_FOLDER_NAME ${LIB} NAME)
         execute_process(COMMAND ${CMAKE_COMMAND} -E copy_directory ${LIB} ${TARGET_FILE_DIR}/${_FOLDER_NAME})

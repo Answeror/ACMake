@@ -35,6 +35,11 @@ macro(acmake_copy_dependencies TARGET)
         VERBATIM
         )
     if(ACMAKE_COPY_DEPENDENCIES_INSTALL)
+        string(
+            REPLACE "${CMAKE_INSTALL_PREFIX}" "\${CMAKE_INSTALL_PREFIX}" 
+            ACMAKE_COPY_DEPENDENCIES_INSTALL_DIR
+            ${ACMAKE_COPY_DEPENDENCIES_INSTALL_DIR}
+            )
         add_custom_command(
             TARGET ${TARGET}
             POST_BUILD
