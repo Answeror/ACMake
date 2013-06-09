@@ -7,24 +7,31 @@ include(acmake_parse_arguments)
 
 set(ACMAKE_FIXUP_PATH ${CMAKE_CURRENT_LIST_DIR}/acmake_fixup.cmake.in)
 set(ACMAKE_FIXUP_INSTALL_PATH ${CMAKE_CURRENT_LIST_DIR}/acmake_fixup_install.cmake.in)
+set(ACMAKE_MAKE_FIXUP_INSTALL_PATH ${CMAKE_CURRENT_LIST_DIR}/acmake_make_fixup_install.cmake.in)
 set(ACMAKE_FIXUP_COMMON_PATH ${CMAKE_CURRENT_LIST_DIR}/acmake_fixup_common.cmake)
 
 macro(acmake_copy_dependencies TARGET)
     acmake_parse_arguments(
         ACMAKE_COPY_DEPENDENCIES
-        "INSTALL_DIR"
+        "INSTALL_DIR;CONFIGURATIONS"
         "INSTALL"
         ${ARGN}
         )
     acmake_get_target_property(RUNTIME_DIRS ${TARGET} ACMAKE_RUNTIME_DIRS)
     acmake_get_target_property(RUNTIME ${TARGET} ACMAKE_RUNTIME)
-    acmake_get_target_property(RUNTIME_DEBUG ${TARGET} ACMAKE_RUNTIME_DEBUG)
-    acmake_get_target_property(RUNTIME_RELEASE ${TARGET} ACMAKE_RUNTIME_RELEASE)
+    foreach(CONFIG DEBUG RELEASE)
+        set(RUNTIME_${CONFIG})
+    endforeach()
+    foreach(CONFIG ${ACMAKE_COPY_DEPENDENCIES_CONFIGURATIONS})
+        string(TOUPPER ${CONFIG} _CONFIG_UPPER)
+        acmake_get_target_property(RUNTIME_${_CONFIG_UPPER} ${TARGET} ACMAKE_RUNTIME_${_CONFIG_UPPER})
+    endforeach()
     configure_file(
         ${ACMAKE_FIXUP_PATH}
         ${CMAKE_CURRENT_BINARY_DIR}/acmake_fixup.cmake
         @ONLY
         )
+    set(CONFIGURATIONS ${ACMAKE_COPY_DEPENDENCIES_CONFIGURATIONS})
     add_custom_command(
         TARGET ${TARGET}
         POST_BUILD
@@ -35,10 +42,10 @@ macro(acmake_copy_dependencies TARGET)
         VERBATIM
         )
     if(ACMAKE_COPY_DEPENDENCIES_INSTALL)
-        string(
-            REPLACE "${CMAKE_INSTALL_PREFIX}" "\${CMAKE_INSTALL_PREFIX}" 
-            ACMAKE_COPY_DEPENDENCIES_INSTALL_DIR
-            ${ACMAKE_COPY_DEPENDENCIES_INSTALL_DIR}
+        configure_file(
+            ${ACMAKE_MAKE_FIXUP_INSTALL_PATH}
+            ${CMAKE_CURRENT_BINARY_DIR}/acmake_make_fixup_install.cmake
+            @ONLY
             )
         add_custom_command(
             TARGET ${TARGET}
@@ -48,8 +55,13 @@ macro(acmake_copy_dependencies TARGET)
                 -DCMAKE_BUILD_TYPE=$<CONFIGURATION>
                 -DINSTALL_TEMPLATE=${ACMAKE_FIXUP_INSTALL_PATH}
                 -DINSTALL_SCRIPT=${CMAKE_CURRENT_BINARY_DIR}/acmake_fixup_install.cmake
-                -P ${CMAKE_CURRENT_BINARY_DIR}/acmake_fixup.cmake
+                -P ${CMAKE_CURRENT_BINARY_DIR}/acmake_make_fixup_install.cmake
             VERBATIM
+            )
+        string(
+            REPLACE "${CMAKE_INSTALL_PREFIX}" "\${CMAKE_INSTALL_PREFIX}" 
+            ACMAKE_COPY_DEPENDENCIES_INSTALL_DIR
+            ${ACMAKE_COPY_DEPENDENCIES_INSTALL_DIR}
             )
         install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/acmake_fixup_install.cmake)
     endif()
