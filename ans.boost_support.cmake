@@ -24,79 +24,93 @@ if(NOT ACMAKE_BOOST_SUPPORT_INCLUDED)
         parse_arguments(
             BOOST_SUPPORT
             "COMPONENTS;WORKING_DIRECTORY;THREAD"
-            "STATIC;SHARED;COPY_DLL;COPY_SHARED"
+            "STATIC;SHARED;COPY_DLL;COPY_SHARED;REUSE"
             ${ARGN}
             )
         car(BOOST_SUPPORT_TARGET ${BOOST_SUPPORT_DEFAULT_ARGS})
-        # threading {{{
-        if(NOT BOOST_SUPPORT_THREAD)
-            set(Boost_USE_MULTITHREADED ON)
-        elseif("${BOOST_SUPPORT_THREAD}" EQUAL "SINGLE")
-            set(Boost_USE_MULTITHREADED OFF)
-        elseif("${BOOST_SUPPORT_THREAD}" EQUAL "MULTI")
-            set(Boost_USE_MULTITHREADED ON)
-        else()
-            acmake_error("Known threading option: %{BOOST_SUPPORT_THREAD}")
-        endif()
-        # }}}
-        if(ANDROID)
-            # FindBoost.cmake cannot determine compiler on windows
-            set(Boost_COMPILER -gcc)
-            set(Boost_USE_STATIC_RUNTIME ON)
-        else()
-            set(Boost_USE_STATIC_RUNTIME OFF)
-        endif()
-        if(BOOST_SUPPORT_STATIC)
-            set(Boost_USE_STATIC_LIBS ON)
-        else()
-            # use shared library by default
-            set(BOOST_SUPPORT_SHARED TRUE)
-            set(Boost_USE_STATIC_LIBS OFF)
-            # use shared library in unit test {{{
-            list(FIND BOOST_SUPPORT_COMPONENTS unit_test_framework
-                BOOST_SUPPORT_UNIT_TEST)
-            if(NOT "${BOOST_SUPPORT_UNIT_TEST}" EQUAL "-1")
-                add_definitions(-DBOOST_TEST_DYN_LINK)
+
+        # reuse previously found boost
+        if(BOOST_SUPPORT_REUSE AND Boost_FOUND)
+            message(STATUS "reuse previously found boost")
+            if(Boost_LIBRARIES)
+                if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_LESS 2.8.11)
+                    include_directories(${Boost_INCLUDE_DIRS})
+                endif()
+                target_link_libraries(${BOOST_SUPPORT_TARGET} ${Boost_LIBRARIES})
+            else()
+                include_directories(${Boost_INCLUDE_DIRS})
             endif()
-            list(FIND BOOST_SUPPORT_COMPONENTS program_options
-                BOOST_SUPPORT_PROGRAM_OPTIONS)
-            if(NOT "${BOOST_SUPPORT_PROGRAM_OPTIONS}" EQUAL "-1")
-                add_definitions(-DBOOST_PROGRAM_OPTIONS_DYN_LINK)
+        else()
+            # threading {{{
+            if(NOT BOOST_SUPPORT_THREAD)
+                set(Boost_USE_MULTITHREADED ON)
+            elseif("${BOOST_SUPPORT_THREAD}" EQUAL "SINGLE")
+                set(Boost_USE_MULTITHREADED OFF)
+            elseif("${BOOST_SUPPORT_THREAD}" EQUAL "MULTI")
+                set(Boost_USE_MULTITHREADED ON)
+            else()
+                acmake_error("Known threading option: %{BOOST_SUPPORT_THREAD}")
             endif()
             # }}}
-        endif()
-        set(Boost_USE_MULTITHREADED ON)
-        if(BOOST_SUPPORT_COMPONENTS)
-            if (NOT BOOST_SUPPORT_TARGET)
-                message(FATAL_ERROR "Target must be specified.")
+            if(ANDROID)
+                # FindBoost.cmake cannot determine compiler on windows
+                set(Boost_COMPILER -gcc)
+                set(Boost_USE_STATIC_RUNTIME ON)
+            else()
+                set(Boost_USE_STATIC_RUNTIME OFF)
             endif()
-            acmake_find_package(
-                Boost
-                REQUIRED
-                COMPONENTS
-                ${BOOST_SUPPORT_COMPONENTS}
-                )
-            link_directories(${Boost_LIBRARY_DIRS})
-            target_link_libraries("${BOOST_SUPPORT_TARGET}" ${Boost_LIBRARIES})
-    
-            # copy dll
-            if(BOOST_SUPPORT_SHARED)
-                if(BOOST_SUPPORT_COPY_DLL OR BOOST_SUPPORT_COPY_SHARED)
-                    acmake_append_runtime_dirs(${BOOST_SUPPORT_TARGET} ${Boost_LIBRARY_DIRS})
+            if(BOOST_SUPPORT_STATIC)
+                set(Boost_USE_STATIC_LIBS ON)
+            else()
+                # use shared library by default
+                set(BOOST_SUPPORT_SHARED TRUE)
+                set(Boost_USE_STATIC_LIBS OFF)
+                # use shared library in unit test {{{
+                list(FIND BOOST_SUPPORT_COMPONENTS unit_test_framework
+                    BOOST_SUPPORT_UNIT_TEST)
+                if(NOT "${BOOST_SUPPORT_UNIT_TEST}" EQUAL "-1")
+                    add_definitions(-DBOOST_TEST_DYN_LINK)
                 endif()
+                list(FIND BOOST_SUPPORT_COMPONENTS program_options
+                    BOOST_SUPPORT_PROGRAM_OPTIONS)
+                if(NOT "${BOOST_SUPPORT_PROGRAM_OPTIONS}" EQUAL "-1")
+                    add_definitions(-DBOOST_PROGRAM_OPTIONS_DYN_LINK)
+                endif()
+                # }}}
             endif()
-        else()
-            # head only support
-            acmake_find_package(Boost REQUIRED)
-        endif()
-    
-        boost_config()
-        include_directories(${Boost_INCLUDE_DIRS})
-    
-        # try to find extensions
-        if(OVEN_TO_BOOST_HOME)
-            message("Found OvenToBoost.")
-            include_directories(${OVEN_TO_BOOST_HOME})
+            set(Boost_USE_MULTITHREADED ON)
+            if(BOOST_SUPPORT_COMPONENTS)
+                if (NOT BOOST_SUPPORT_TARGET)
+                    message(FATAL_ERROR "Target must be specified.")
+                endif()
+                acmake_find_package(
+                    Boost
+                    REQUIRED
+                    COMPONENTS
+                    ${BOOST_SUPPORT_COMPONENTS}
+                    )
+                link_directories(${Boost_LIBRARY_DIRS})
+                target_link_libraries("${BOOST_SUPPORT_TARGET}" ${Boost_LIBRARIES})
+        
+                # copy dll
+                if(BOOST_SUPPORT_SHARED)
+                    if(BOOST_SUPPORT_COPY_DLL OR BOOST_SUPPORT_COPY_SHARED)
+                        acmake_append_runtime_dirs(${BOOST_SUPPORT_TARGET} ${Boost_LIBRARY_DIRS})
+                    endif()
+                endif()
+            else()
+                # head only support
+                acmake_find_package(Boost REQUIRED)
+            endif()
+        
+            boost_config()
+            include_directories(${Boost_INCLUDE_DIRS})
+        
+            # try to find extensions
+            if(OVEN_TO_BOOST_HOME)
+                message("Found OvenToBoost.")
+                include_directories(${OVEN_TO_BOOST_HOME})
+            endif()
         endif()
     endmacro()
     
