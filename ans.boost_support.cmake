@@ -36,7 +36,7 @@ if(NOT ACMAKE_BOOST_SUPPORT_INCLUDED)
                 if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_LESS 2.8.11)
                     include_directories(${Boost_INCLUDE_DIRS})
                 endif()
-                target_link_libraries(${BOOST_SUPPORT_TARGET} ${Boost_LIBRARIES})
+                target_link_libraries(${BOOST_SUPPORT_TARGET} LINK_PUBLIC ${Boost_LIBRARIES})
             else()
                 include_directories(${Boost_INCLUDE_DIRS})
             endif()
@@ -90,7 +90,7 @@ if(NOT ACMAKE_BOOST_SUPPORT_INCLUDED)
                     ${BOOST_SUPPORT_COMPONENTS}
                     )
                 link_directories(${Boost_LIBRARY_DIRS})
-                target_link_libraries("${BOOST_SUPPORT_TARGET}" ${Boost_LIBRARIES})
+                target_link_libraries("${BOOST_SUPPORT_TARGET}" LINK_PUBLIC ${Boost_LIBRARIES})
         
                 # copy dll
                 if(BOOST_SUPPORT_SHARED)
