@@ -1,0 +1,10 @@
+if(ACMAKE_SET_INSTALL_PREFIX_INCLUDED)
+    return()
+endif()
+set(ACMAKE_SET_INSTALL_PREFIX_INCLUDED TRUE)
+
+macro(acmake_set_install_prefix)
+    if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+        set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/intall CACHE PATH "install path" FORCE)
+    endif()
+endmacro()
