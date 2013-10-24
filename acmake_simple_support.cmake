@@ -1,7 +1,12 @@
 # warning: do not use this directly, use acmake_xxx_support instead
+if(ACMAKE_SIMPLE_SUPPORT_INCLUDED)
+    return()
+endif()
+set(ACMAKE_SIMPLE_SUPPORT_INCLUDED TRUE)
 
 include(acmake_common)
 include(acmake_find_package)
+include(acmake_target_property)
 
 # usage: acmake_simple_support(<target> <library>)
 # 
@@ -26,5 +31,8 @@ macro(acmake_simple_support TARGET LIBRARY)
     endif()
     if(${UPPER_LIBRARY}_LIBRARIES)
         target_link_libraries(${TARGET} LINK_PUBLIC ${${UPPER_LIBRARY}_LIBRARIES})
+    endif()
+    if(${UPPER_LIBRARY}_RUNTIME_DIRS)
+        acmake_append_runtime_dirs(${TARGET} ${${UPPER_LIBRARY}_RUNTIME_DIRS})
     endif()
 endmacro()
