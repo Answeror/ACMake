@@ -65,6 +65,7 @@ if(NOT ACMAKE_BOOST_SUPPORT_INCLUDED)
                 # use shared library by default
                 set(BOOST_SUPPORT_SHARED TRUE)
                 set(Boost_USE_STATIC_LIBS OFF)
+                add_definitions(-DBOOST_ALL_DYN_LINK)
                 # use shared library in unit test {{{
                 list(FIND BOOST_SUPPORT_COMPONENTS unit_test_framework
                     BOOST_SUPPORT_UNIT_TEST)
