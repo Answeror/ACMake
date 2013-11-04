@@ -7,7 +7,7 @@ include(acmake_target_property)
 
 macro(acmake_target_link_libraries target)
     target_link_libraries(${target} ${ARGN})
-    set(_runtime_dirs)
+    set(_runtime_dirs "")
     get_target_property(_deps ${target} LINK_LIBRARIES)
     foreach(_dep ${_deps})
         acmake_get_target_property(_dirs ${_dep} ACMAKE_RUNTIME_DIRS)
