@@ -711,6 +711,15 @@ set(Boost_ERROR_REASON)
     endif()
 
     # Look for a standard boost header file.
+    # search custom path first on linux
+    # http://www.cmake.org/cmake/help/v3.0/command/find_path.html
+    find_path(Boost_INCLUDE_DIR
+      NAMES         boost/config.hpp
+      HINTS         ${_boost_INCLUDE_SEARCH_DIRS}
+      PATH_SUFFIXES ${_boost_PATH_SUFFIXES}
+      ${_boost_FIND_OPTIONS}
+      NO_DEFAULT_PATH
+      )
     find_path(Boost_INCLUDE_DIR
       NAMES         boost/config.hpp
       HINTS         ${_boost_INCLUDE_SEARCH_DIRS}
